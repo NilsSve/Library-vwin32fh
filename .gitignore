@@ -1,0 +1,6 @@
+StudioLibrary/Workspace.loc
+*.prn
+*.exe
+*.dep
+*.dbg
+FileHandlingDemo.exe.manifest
