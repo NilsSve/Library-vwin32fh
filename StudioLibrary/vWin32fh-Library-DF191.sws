@@ -1,6 +1,6 @@
 [Properties]
-Version=15.0
+Version=19.1
 [WorkspacePaths]
 ConfigFile=.\config.ws
 [Projects]
-[ProjectParameters]
+Project0=FileHandlingDemo.src

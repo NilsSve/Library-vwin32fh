@@ -85,16 +85,22 @@ Define vSE_ERR_SHARE           For |CI0026
 
 //declare C structure struct_browseinfo
 //as documented in MSDN under Windows Shell API
-Type vtBrowseInfo
-  Field vtBrowseInfo.hWndOwner      as Handle
-  Field vtBrowseInfo.pIDLRoot       as Pointer
-  Field vtBrowseInfo.pszDisplayName as Pointer
-  Field vtBrowseInfo.lpszTitle      as Pointer
-  Field vtBrowseInfo.ulFlags        as dWord
-  Field vtBrowseInfo.lpfnCallback   as Pointer
-  Field vtBrowseInfo.lParam         as dWord
-  Field vtBrowseInfo.iImage         as dWord
-End_Type // tBrowseInfo
+Struct tvBrowseInfo
+  Handle    hWndOwner
+  Pointer   pIDLRoot
+  Pointer   pszDisplayName
+  Pointer   lpszTitle
+  DWord     ulFlags
+#IFDEF IS$WIN64
+    DWord   BrowseInfoMissingAlignment1
+#ENDIF
+  Pointer   lpfnCallback
+  LongPtr   lParam
+  DWord     iImage
+#IFDEF IS$WIN64
+    DWord   BrowseInfoMissingAlignment2
+#ENDIF
+End_Struct // tvBrowseInfo
 
 // Browsing for directory.
 Define vBIF_RETURNONLYFSDIRS   For |CI$0001  // For finding a folder to start document searching
@@ -117,10 +123,10 @@ Define vBIF_BROWSEFORPRINTER   For |CI$2000  // Browsing for Printers
 //Define BFFM_SETSELECTION       (WM_USER + 102)
 
 
-External_function vWin32_SHBrowseForFolder "SHBrowseForFolder" shell32.dll ;
+External_function vWin32_SHBrowseForFolder "SHBrowseForFolderW" shell32.dll ;
   Pointer lpsBrowseInfo Returns dWord
 
-External_function vWin32_SHGetPathFromIDList "SHGetPathFromIDList" shell32.dll ;
+External_function vWin32_SHGetPathFromIDList "SHGetPathFromIDListW" shell32.dll ;
   Pointer pidList Pointer lpBuffer Returns dWord
 
 External_function vWin32_CoTaskMemFree "CoTaskMemFree" ole32.dll Pointer pV Returns Integer
@@ -128,11 +134,17 @@ External_function vWin32_CoTaskMemFree "CoTaskMemFree" ole32.dll Pointer pV Retu
 
 
 
-Type vtSecurity_attributes
-  Field vtSecurity_attributes.nLength        as dWord
-  Field vtSecurity_attributes.lpDescriptor   as Pointer
-  Field vtSecurity_attributes.bInheritHandle as Integer
-End_Type // vtSecurity_attributes
+Struct tvSecurity_attributes
+  DWord   nLength
+#IFDEF IS$WIN64
+    DWord   Security_attributesMissingAlignment1
+#ENDIF
+  Pointer lpDescriptor
+  Integer bInheritHandle
+#IFDEF IS$WIN64
+    Integer Security_attributesMissingAlignment2
+#ENDIF
+End_Struct // tvSecurity_attributes
 
 //nLength:
 // Specifies the size, in bytes, of this structure. Set this value to the size of the
@@ -168,8 +180,8 @@ End_Type // vtSecurity_attributes
 // Returns:
 //  If the function succeeds, the return value is nonzero.
 //  If the function fails, the return value is zero. To get extended error information, call GetLastError.
-External_function vWin32_CreateDirectory "CreateDirectoryA" kernel32.dll ;
-  Pointer lpPathName Pointer lpSecurity_Attributes Returns Integer
+External_function vWin32_CreateDirectory "CreateDirectoryW" kernel32.dll ;
+  WString sPathName Pointer lpSecurity_Attributes Returns Integer
 
 
 // lpPathName
@@ -179,8 +191,8 @@ External_function vWin32_CreateDirectory "CreateDirectoryA" kernel32.dll ;
 // Returns:
 //  If the function succeeds, the return value is nonzero.
 //  If the function fails, the return value is zero. To get extended error information, call GetLastError.
-External_function vWin32_RemoveDirectory "RemoveDirectoryA" kernel32.dll ;
-  Pointer lpPathName Returns Integer
+External_function vWin32_RemoveDirectory "RemoveDirectoryW" kernel32.dll ;
+  WString sPathName Returns Integer
 
 
 
@@ -223,46 +235,52 @@ External_function vWin32_RemoveDirectory "RemoveDirectoryA" kernel32.dll ;
 // Code to open the program that is associated with the selected file.
 //
 // External function call used in Procedure DoStartDocument
-External_function vWin32_ShellExecute "ShellExecuteA" shell32.dll ;
-  Handle hWnd ;
-  Pointer lpOperation ;
-  Pointer lpFile ;
-  Pointer lpParameters ;
-  Pointer lpDirectory ;
-  Dword iShowCmd Returns Handle
+External_function vWin32_ShellExecute "ShellExecuteW" shell32.dll ;
+  Handle  hWnd ;
+  WString wsOperation ;
+  WString wsFile ;
+  WString wsParameters ;
+  WString wsDirectory ;
+  Dword   iShowCmd Returns Handle
 
 
 
 #IFDEF vFO_MOVE
 #ELSE
 
-#Replace vFO_MOVE           |CI$0001
-#Replace vFO_COPY           |CI$0002
-#Replace vFO_DELETE         |CI$0003
-#Replace vFO_RENAME         |CI$0004
+Define vFO_MOVE                For |CI$0001
+Define vFO_COPY                For |CI$0002
+Define vFO_DELETE              For |CI$0003
+Define vFO_RENAME              For |CI$0004
 
-#Replace vFOF_MULTIDESTFILES     |CI$0001
-#Replace vFOF_CONFIRMMOUSE       |CI$0002
-#Replace vFOF_SILENT             |CI$0004  // don't create progress/report
-#Replace vFOF_RENAMEONCOLLISION  |CI$0008
-#Replace vFOF_NOCONFIRMATION     |CI$0010  // Don't prompt the user.
-#Replace vFOF_WANTMAPPINGHANDLE  |CI$0020  // Fill in SHFILEOPSTRUCT.hNameMappings
+Define vFOF_MULTIDESTFILES     For |CI$0001
+Define vFOF_CONFIRMMOUSE       For |CI$0002
+Define vFOF_SILENT             For |CI$0004  // don't create progress/report
+Define vFOF_RENAMEONCOLLISION  For |CI$0008
+Define vFOF_NOCONFIRMATION     For |CI$0010  // Don't prompt the user.
+Define vFOF_WANTMAPPINGHANDLE  For |CI$0020  // Fill in SHFILEOPSTRUCT.hNameMappings
                                           // Must be freed using SHFreeNameMappings
-#Replace vFOF_ALLOWUNDO          |CI$0040
-#Replace vFOF_FILESONLY          |CI$0080  // on *.*, do only files
-#Replace vFOF_SIMPLEPROGRESS     |CI$0100  // means don't show names of files
-#Replace vFOF_NOCONFIRMMKDIR     |CI$0200  // don't confirm making any needed dirs
+Define vFOF_ALLOWUNDO          For |CI$0040
+Define vFOF_FILESONLY          For |CI$0080  // on *.*, do only files
+Define vFOF_SIMPLEPROGRESS     For |CI$0100  // means don't show names of files
+Define vFOF_NOCONFIRMMKDIR     For |CI$0200  // don't confirm making any needed dirs
 
-Type vtShFileOpStruct
-  Field vtShFileOpStruct.hWnd                   as Handle
-  Field vtShFileOpStruct.wFunc                  as Integer
-  Field vtShFileOpStruct.pFrom                  as Pointer
-  Field vtShFileOpStruct.pTo                    as Pointer
-  Field vtShFileOpStruct.fFlags                 as Short
-  Field vtShFileOpStruct.fAnyOperationsAborted  as Short
-  Field vtShFileOpStruct.hNameMappings          as Pointer
-  Field vtShFileOpStruct.lpszProgressTitle      as Pointer // only used if FOF_SIMPLEPROGRESS
-End_Type // tShFileOpStruct
+Struct tvShFileOpStruct
+  Handle   hWnd
+  UInteger wFunc
+#IFDEF IS$WIN64
+    UInteger ShFileOpStructMissingAlignment1
+#ENDIF
+  Pointer  pFrom
+  Pointer  pTo
+  Short    fFlags
+  Integer  fAnyOperationsAborted
+#IFDEF IS$WIN64
+    Short  ShFileOpStructMissingAlignment2
+#ENDIF
+  Pointer  hNameMappings
+  Pointer  lpszProgressTitle      // only used if FOF_SIMPLEPROGRESS
+End_Struct // tvShFileOpStruct
 
 // hwnd
 //   Handle of the dialog box to use to display information about the status of the operation.
@@ -293,12 +311,12 @@ End_Type // tShFileOpStruct
 // Performs a copy, move, rename, or delete operation on a file system object.
 // This can be a file or a folder.
 // With thanks to Andrew S Kaplan
-External_function vWin32_SHFileOperation "SHFileOperationA" Shell32.dll ;
+External_function vWin32_SHFileOperation "SHFileOperationW" Shell32.dll ;
         Pointer lpFileOp Returns Integer
 
 
 // Thanks To Oliver Nelson for posting this code on the newsgroups
-External_function vWin32_GetWindowsDirectory "GetWindowsDirectoryA" kernel32.dll ;
+External_function vWin32_GetWindowsDirectory "GetWindowsDirectoryW" kernel32.dll ;
                            Pointer lpBuffer Integer nSize Returns Integer
 
 
@@ -311,18 +329,18 @@ External_function vWin32_GetWindowsDirectory "GetWindowsDirectoryA" kernel32.dll
 //   Pointer lpTempFileName ;
 //   Returns Integer
 // **WvA: 28-04-2005 Changed string parameter type into pointers
-External_function vWin32_GetTempFileName "GetTempFileNameA" kernel32.dll Pointer lpsPath ;
-        Pointer lpsPrefix Integer iUnique Pointer pLoad Returns Integer
+External_function vWin32_GetTempFileName "GetTempFileNameW" kernel32.dll WString sPath ;
+        WString sPrefix Integer iUnique Pointer lpTempFileName Returns Integer
 
-External_function vWin32_GetTempPath "GetTempPathA" Kernel32.Dll ;
+External_function vWin32_GetTempPath "GetTempPathW" Kernel32.Dll ;
    Dword nBufferLength ;
    Pointer lpBuffer ;
    Returns Integer
 
-External_function vWin32_DeleteFile "DeleteFileA" Kernel32.Dll ;
-   Pointer lpFileName ;
+External_function vWin32_DeleteFile "DeleteFileW" Kernel32.Dll ;
+   WString sFileName ;
    Returns Integer
-                  
+
 // from:
 // http://msdn.microsoft.com/library/default.asp?url=/library/en-us/shellcc/platform/shell/reference/enums/csidl.asp
 //
@@ -403,7 +421,7 @@ Define vCSIDL_WINDOWS           For |CI$0024 // The Windows directory or SYSROOT
 // Windows NT 4.0. This DLL always calls the current platform's version of this function.
 // If that fails, it will try to simulate the appropriate behavior.
 //
-External_function vWin32_SHGetFolderPath "SHGetFolderPathA" SHFolder.Dll ;
+External_function vWin32_SHGetFolderPath "SHGetFolderPathW" SHFolder.Dll ;
    Pointer hWnd ;
    Integer nFolder ;
    Pointer hToken ;
@@ -413,45 +431,32 @@ External_function vWin32_SHGetFolderPath "SHGetFolderPathA" SHFolder.Dll ;
 
 
 
-Type vWin32_Find_Data
-  Field vWin32_Find_Data.dwFileAttributes As Dword
-  Field vWin32_Find_Data.ftCreationLowDateTime As Dword
-  Field vWin32_Find_Data.ftCreationHighDateTime As Dword
-  Field vWin32_Find_Data.ftLastAccessLowDateTime As dword
-  Field vWin32_Find_Data.ftLastAccessHighDateTime As Dword
-  Field vWin32_Find_Data.ftLastWriteLowDateTime As Dword
-  Field vWin32_Find_Data.ftLastWriteHighDateTime As Dword
-  Field vWin32_Find_Data.nFileSizeHigh As Dword
-  Field vWin32_Find_Data.nFileSizeLow As Dword
-  Field vWin32_Find_Data.dwReserved0 As Dword
-  Field vWin32_Find_Data.dwReserved1 As Dword
-  Field vWin32_Find_Data.cFileName As Char vMax_Path
-  Field vWin32_Find_Data.cAlternateFileName As Char 14
-End_Type // vWin32_Find_Data
+Struct tvWin32FindData
+ Dword            dwFileAttributes
+ Dword            ftCreationLowDateTime
+ Dword            ftCreationHighDateTime
+ dword            ftLastAccessLowDateTime
+ Dword            ftLastAccessHighDateTime
+ Dword            ftLastWriteLowDateTime
+ Dword            ftLastWriteHighDateTime
+ Dword            nFileSizeHigh
+ Dword            nFileSizeLow
+ Dword            dwReserved0
+ Dword            dwReserved1
+ Short[vMax_Path] cFileName
+ Short[14]        cAlternateFileName
+End_Struct
 
 // Courtesy Of Vincent Oorsprong
 // lpFileName      : address of name of file to search for
 // lpFindFileData  : address of returned information
-External_function vWin32_FindFirstFile "FindFirstFileA"  Kernel32.dll Pointer lpFileName ;
+External_function vWin32_FindFirstFile "FindFirstFileW"  Kernel32.dll WString sFileName ;
           Pointer lpFindFileData Returns Handle
 
 // Courtesy Of Vincent Oorsprong
 // hFindFile       : handle of search
 // lpFindFileData  : address of structure for data on found file
-External_function vWin32_FindNextFile "FindNextFileA" Kernel32.dll Handle hFindFile ;
-          Pointer lpFindFileData Returns Integer
-  
-//
-// Unicode equivalents
-//
-// lpFileName      : address of name of file to search for
-// lpFindFileData  : address of returned information
-External_function vWin32W_FindFirstFile "FindFirstFileW"  Kernel32.dll Pointer lpFileName ;
-          Pointer lpFindFileData Returns Handle
-
-// hFindFile       : handle of search
-// lpFindFileData  : address of structure for data on found file
-External_function vWin32W_FindNextFile "FindNextFileW" Kernel32.dll Handle hFindFile ;
+External_function vWin32_FindNextFile "FindNextFileW" Kernel32.dll Handle hFindFile ;
           Pointer lpFindFileData Returns Integer
 
 
@@ -461,22 +466,22 @@ External_function vWin32_FindClose "FindClose" Kernel32.dll Handle hFindFile Ret
 
 
 
-Type vFileTime
-  Field vFileTime.dwLowDateTime As Dword
-  Field vFileTime.dwHighDateTime As Dword
-End_Type // vFileTime
+Struct tvFileTime
+  DWord dwLowDateTime
+  DWord dwHighDateTime
+End_Struct
 
 
-Type vSystemTime
-  Field vSystemTime.wYear As Word
-  Field vSystemTime.wMonth As Word
-  Field vSystemTime.wDayOfWeek As Word
-  Field vSystemTime.wDay As Word
-  Field vSystemTime.wHour As Word
-  Field vSystemTime.wMinute As Word
-  Field vSystemTime.wSecond As Word
-  Field vSystemTime.wMilliSeconds As Word
-End_Type // vSystemTime
+Struct tvSystemTime
+  UShort wYear
+  UShort wMonth
+  UShort wDayOfWeek
+  UShort wDay
+  UShort wHour
+  UShort wMinute
+  UShort wSecond
+  UShort wMilliSeconds
+End_Struct
 
 
 // Courtesy Of Vincent Oorsprong
@@ -503,7 +508,7 @@ External_function vWin32_FileTimeToSystemTime "FileTimeToSystemTime" Kernel32.Dl
 // For example, to get the time string  "11:29:40 PM"
 //    use the following picture string: "hh" : "mm" : "ss tt"
 
-External_function vWin32_GetTimeFormat "GetTimeFormatA" Kernel32.Dll ;
+External_function vWin32_GetTimeFormat "GetTimeFormatW" Kernel32.Dll ;
   Dword LCID Dword dwFlags Pointer lpsSystemTime Pointer lpFormat Pointer lpTimeStr ;
   Integer cchTime Returns Integer
 
@@ -533,19 +538,19 @@ External_function vWin32_GetTimeFormat "GetTimeFormatA" Kernel32.Dll ;
 // For example, to get the date string  "Wed, Aug 31 94"
 // use the following picture string:    "ddd","MMM dd yy"
 
-External_function vWin32_GetDateFormat "GetDateFormatA" Kernel32.Dll ;
+External_function vWin32_GetDateFormat "GetDateFormatW" Kernel32.Dll ;
   Dword LCID Dword dwFlags Pointer lpsSystemTime Pointer lpFormat Pointer lpDateStr ;
   Integer cchDate Returns Integer
 
 Define LOCALE_NOUSEROVERRIDE    For |CI$80000000  //  do not use user overrides
-Define TIME_NOMIHUTESORSECONDS  For |CI$0000000l  //  do not use minutes or seconds
+Define TIME_NOMIHUTESORSECONDS  For |CI$00000001  //  do not use minutes or seconds
 Define TIME_NOSECONDS           For |CI$00000002  //  do not use seconds
 Define TIME_NOTIMEMARKER        For |CI$00000004  //  do not use time marker
 Define TIME_FORCE24HOURFORMAT   For |CI$00000008  //  always use 24 hour format
 
 //  Date Flags for GetDateFormatW.
 //
-Define DATE_SHORTDATE           For |CI$0000000l  //  use short date picture
+Define DATE_SHORTDATE           For |CI$00000001  //  use short date picture
 Define DATE_LONGDATE            For |CI$00000002  //  use long date picture
 Define DATE_USE_ALT_CALENDAR    For |CI$00000004  //  use alternate calendar (if any)
 
@@ -570,7 +575,7 @@ Define SHFMT_OPT_SYSONLY       For |CI$00000002 // Selects the "Create an MS-DOS
 Define SHFMT_ERROR             For (|CI$FFFFFFFF+1) // An error occurred during the last format or no drive parameter passed. This does not indicate that the disk is unformatable.
 Define SHFMT_CANCEL            For (|CI$FFFFFFFE+1) // The last format was canceled.
 Define SHFMT_NOFORMAT          For (|CI$FFFFFFFD+1) // The drive cannot be formatted.
-                                                
+
 
  // Courtesy Of Steve Walter,
  // USA Software, Inc
@@ -610,5 +615,9 @@ External_function vWin32_ShFormatDrive "SHFormatDrive" shell32.dll Handle hWnd ;
 //            const SECURITY_ATTRIBUTES *psa
 //        );
 
-External_function vWin32_SHCreateDirectoryEx "SHCreateDirectoryExA" shell32.dll Handle hWnd;
-                  pointer pszPath  Pointer lpSecurity_Attributes Returns Integer
+External_function vWin32_SHCreateDirectoryEx "SHCreateDirectoryExW" shell32.dll Handle hWnd;
+                  WString wPath  Pointer lpSecurity_Attributes Returns Integer
+
+#IFNDEF GET_vWin32_PathIsDirectory
+ External_Function vWin32_PathIsDirectory "PathIsDirectoryW" SHLWAPI.DLL WString wPath Returns Integer
+#ENDIF

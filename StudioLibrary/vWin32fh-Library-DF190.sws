@@ -3,4 +3,6 @@ Version=19.0
 [WorkspacePaths]
 ConfigFile=.\config.ws
 [Projects]
-[ProjectParameters]
+Project0=FileHandlingDemo.src
+[Conditionals]
+Is$WebApp=False
