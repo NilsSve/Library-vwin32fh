@@ -2,6 +2,7 @@
 From VDF-GUIdance: vWin32fh WINAPI file handling
 
 Uploaded to GitHub to make it easy to add as a submodule
+For the latest, always check https://www.vdf-guidance.com/ContribPage.asp?Page=PKGWINAPIVWIN32F&ContribRecId=80
 
 # From original readme.txt:
 My apologies for using Visual DataFlex Libraries in a very unconvential way.
