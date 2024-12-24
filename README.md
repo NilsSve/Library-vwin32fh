@@ -1,4 +1,4 @@
-# vwin32fh - This library has been forked from the original vwin32fh reposoitory on GitHub.
+# vwin32fh - This library has been forked from the original vwin32fh repository on GitHub.
 From VDF-GUIdance: vWin32fh WINAPI file handling
 This is a library that is used by main repositories on the NilsSve site (not libraries)! It is being installed automatically when selecting to clone a regular repository.
 
