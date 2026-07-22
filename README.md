@@ -6,6 +6,22 @@ Uploaded to GitHub to make it easy to add as a submodule
 
 For the latest, always check https://www.vdf-guidance.com/ContribPage.asp?Page=PKGWINAPIVWIN32F&ContribRecId=80
 
+## Dependencies
+
+None. vwin32fh is a leaf - nothing here reaches into another RDC library. It is the bottom of
+the dependency graph: RDCToolsLib needs it, and DUF needs it both directly and through
+RDCToolsLib. Keep it dependency-free.
+
+Note that `vWin32fh.pkg` is the only entry point you should `Use`. It picks between
+`vWin32fhA.pkg` (ANSI) and `vWin32fhW.pkg` (Unicode) with a `#IF (!@ < 200)`; `Use`ing either of
+those directly, or both, defeats that and collides.
+
+## Compiling it on its own
+
+`FileHandlingDemo.src` already serves as the canary - it is a real program that exercises the
+package, so a plain compile of it verifies the library standalone. No extra smoke test needed
+here.
+
 # From original readme.txt:
 My apologies for using Visual DataFlex Libraries in a very unconvential way.
 
