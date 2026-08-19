@@ -1,6 +1,15 @@
-[Properties]
-Version=26.0
-[WorkspacePaths]
-ConfigFile=.\config.ws
-[Projects]
-Project0=FileHandlingDemo.src
+{
+    "description": "WINAPI file handling for DataFlex: Win32 file operations and the common file dialogs.",
+    "df": 26.0,
+    "package": {
+        "df-min": 26.0,
+        "version": "2021.11.25"
+    },
+    "paths": {
+        "configFile": "config.ws"
+    },
+    "projects": [
+        "FileHandlingDemo.src"
+    ],
+    "workspaceName": "vWin32fh"
+}
