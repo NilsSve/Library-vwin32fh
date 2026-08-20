@@ -3,6 +3,7 @@
     "df": 26.0,
     "package": {
         "df-min": 26.0,
+        "icon": "VDFGuidance.svg",
         "version": "2021.11.25"
     },
     "paths": {
