@@ -7,7 +7,13 @@
         "version": "2021.11.25"
     },
     "paths": {
-        "configFile": "config.ws"
+        "appHtml": "..",
+        "appSrc": "..",
+        "bitmap": "..",
+        "configFile": "config.ws",
+        "ddSrc": "..",
+        "help": "..",
+        "programs": ".."
     },
     "projects": [
         "FileHandlingDemo.src"

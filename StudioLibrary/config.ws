@@ -1,12 +1,12 @@
 [Workspace]
-Home=..\
-AppSrcPath=.
-AppHTMLPath=.
-BitmapPath=.
-IdeSrcPath=.\StudioLibrary
-DataPath=.\StudioLibrary
-DDSrcPath=.
-HelpPath=.
-ProgramPath=.
-FileList=.\StudioLibrary\filelist.cfg
+Home=.\
+AppSrcPath=..
+AppHTMLPath=..
+BitmapPath=..
+IdeSrcPath=.
+DataPath=.
+DDSrcPath=..
+HelpPath=..
+ProgramPath=..
+FileList=filelist.cfg
 Description=vWin32 File Handling Library
