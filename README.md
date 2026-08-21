@@ -1,35 +1,72 @@
-# vwin32fh - This library has been forked from the original vwin32fh repository on GitHub.
-This is a library that is used by main repositories on the NilsSve site (not libraries)! It is being installed automatically when selecting to clone a regular repository.
+# vwin32fh — Win32 file handling for DataFlex
 
-From VDF-GUIdance: vWin32fh WINAPI file handling
-Uploaded to GitHub to make it easy to add as a submodule
+Windows API file and folder operations as DataFlex global functions: copy, move, rename and delete
+files, create and remove directories, test what exists, work with temporary files, and open the
+standard Windows folder-browsing dialogs.
 
-For the latest, always check https://www.vdf-guidance.com/ContribPage.asp?Page=PKGWINAPIVWIN32F&ContribRecId=80
+This is a fork of the vwin32fh package from
+[VDF-GUIdance](https://www.vdf-guidance.com/ContribPage.asp?Page=PKGWINAPIVWIN32F&ContribRecId=80),
+published here so it can be consumed as a library or a package. Check the VDF-GUIdance page for the
+original and any newer upstream version.
 
-## Dependencies
+## What it provides
 
-None. vwin32fh is a leaf - nothing here reaches into another RDC library. It is the bottom of
-the dependency graph: RDCToolsLib needs it, and DUF needs it both directly and through
-RDCToolsLib. Keep it dependency-free.
+**Files** — `vCopyFile`, `vMoveFile`, `vRenameFile`, `vDeleteFile`, `vFilePathExists`,
+`vConvertFileDateTime`
 
-Note that `vWin32fh.pkg` is the only entry point you should `Use`. It picks between
-`vWin32fhA.pkg` (ANSI) and `vWin32fhW.pkg` (Unicode) with a `#IF (!@ < 200)`; `Use`ing either of
-those directly, or both, defeats that and collides.
+**Folders** — `vCreateDirectory`, `vshCreateDirectoryEX`, `vRemoveDirectory`, `vFolderExists`,
+`vPathIsDirectory`, `vFolderFileCount`
 
-## Compiling it on its own
+**Temporary and system paths** — `vMakeTempFile`, `vCreateTempFileInPath`, `vGetTempPath`,
+`vGetWindowsDirectory`, `vSHGetFolderPath`
 
-`FileHandlingDemo.src` already serves as the canary - it is a real program that exercises the
-package, so a plain compile of it verifies the library standalone. No extra smoke test needed
-here.
+**Dialogs** — `vSHBrowseForFolder`, plus `cvFileDialogs.pkg` for the standard file dialogs
 
-# From original readme.txt:
-My apologies for using Visual DataFlex Libraries in a very unconvential way.
+## Installing
 
-For a minimum class library the standard file layout is a bit overkill.
-Usually there are no data files, no IdeSrc required, no bitmaps etc.. just a few packages.
+**DataFlex 26 and later** — add it as a package. Note the path **inside** the repository: the
+workspace files live in `StudioLibrary`, and leaving that folder out is what makes an install fail.
 
-By putting the library meta data files in a subfolder and having the packages at the top, the focus stays on the code.
+```
+https://github.com/NilsSve/Library-vwin32fh.git/StudioLibrary/vWin32fh-Library-DF26.0.sws
+```
 
-When adding the packages as a library, just select the .sws file version that is for your DataFlex version and it should all work as normal.
+**Earlier DataFlex** — add the matching `.sws` from `StudioLibrary` as a library in your workspace.
 
-You can find the .sws files in the StudioLibrary folder (as is the other meta data stuff)
+## Using it
+
+`Use` the entry point and call the functions:
+
+```dataflex
+Use vWin32fh.pkg
+
+If (vFilePathExists(sSource)) ;
+    Move (vCopyFile(sSource, sTarget, False)) to bOk
+```
+
+⚠️ **`vWin32fh.pkg` is the only file you should `Use`.** It selects between `vwin32fhA.pkg` (ANSI)
+and `vwin32fhW.pkg` (Unicode) for your DataFlex version. Using either of those directly — or both —
+defeats that choice and produces colliding definitions.
+
+`FileHandlingDemo.src` is a working example that exercises the package.
+
+## Requirements
+
+Windows, and a DataFlex version with a matching `.sws` in `StudioLibrary`. vwin32fh depends on no
+other library.
+
+---
+
+## From the original readme
+
+> My apologies for using Visual DataFlex Libraries in a very unconventional way.
+>
+> For a minimum class library the standard file layout is a bit overkill. Usually there are no data
+> files, no IdeSrc required, no bitmaps etc. — just a few packages.
+>
+> By putting the library meta data files in a subfolder and having the packages at the top, the
+> focus stays on the code.
+>
+> When adding the packages as a library, just select the .sws file version that is for your
+> DataFlex version and it should all work as normal. You can find the .sws files in the
+> StudioLibrary folder (as is the other meta data stuff).
