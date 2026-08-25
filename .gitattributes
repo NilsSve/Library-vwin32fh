@@ -5,3 +5,18 @@
 *.dg linguist-language=DataFlex
 *.sl linguist-language=DataFlex
 *.bp linguist-language=DataFlex
+
+# Extensions missing from the original block above:
+*.wo linguist-language=DataFlex
+*.inc linguist-language=DataFlex
+*.rv linguist-language=DataFlex
+*.dd linguist-language=DataFlex
+
+# DataFlex API headers (vwin32fhA.h / vwin32fhW.h) are DataFlex source,
+# not C.
+*.h linguist-language=DataFlex
+*.Inc linguist-language=DataFlex
+
+# Workspace config is INI-format data; without this, *.ws is detected as
+# "Witcher Script" (a game-modding language).
+*.ws linguist-language=INI
