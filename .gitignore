@@ -4,3 +4,4 @@ StudioLibrary/Workspace.loc
 *.dep
 *.dbg
 FileHandlingDemo.exe.manifest
+LoginEncryptionKey.inc
