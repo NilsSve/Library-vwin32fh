@@ -124,7 +124,7 @@ Define vBIF_BROWSEFORPRINTER   For |CI$2000  // Browsing for Printers
 
 
 External_function vWin32_SHBrowseForFolder "SHBrowseForFolderW" shell32.dll ;
-  Pointer lpsBrowseInfo Returns dWord
+  Pointer lpsBrowseInfo Returns Pointer
 
 External_function vWin32_SHGetPathFromIDList "SHGetPathFromIDListW" shell32.dll ;
   Pointer pidList Pointer lpBuffer Returns dWord

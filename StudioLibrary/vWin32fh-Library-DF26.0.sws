@@ -5,7 +5,7 @@
         "df-min": 26.0,
         "icon": "VDFGuidance.svg",
         "license": "BSD-2-Clause",
-        "version": "2021.11.25"
+        "version": "1.0.0"
     },
     "paths": {
         "appHtml": "..",

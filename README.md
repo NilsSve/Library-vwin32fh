@@ -28,8 +28,11 @@ original and any newer upstream version.
 workspace files live in `StudioLibrary`, and leaving that folder out is what makes an install fail.
 
 ```
-https://github.com/NilsSve/Library-vwin32fh.git/StudioLibrary/vWin32fh-Library-DF26.0.sws
+https://github.com/NilsSve/Library-vwin32fh.git/StudioLibrary/vWin32fh-Library-DF26.0.sws#1.0.0
 ```
+
+Each release has a version tag (`1.0.0`, ...). The `#1.0.0` at the end of the address asks for that
+release; without it the package manager takes the newest commit.
 
 **Earlier DataFlex** — add the matching `.sws` from `StudioLibrary` as a library in your workspace.
 
