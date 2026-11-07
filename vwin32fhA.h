@@ -259,7 +259,7 @@ Struct tvShFileOpStruct
   Pointer pFrom
   Pointer pTo
   Short   fFlags
-  Short   fAnyOperationsAborted
+  Integer fAnyOperationsAborted  // a Windows BOOL, four bytes: the struct is 30 bytes, as Windows reads it
   Pointer hNameMappings
   Pointer lpszProgressTitle      // only used if FOF_SIMPLEPROGRESS
 End_Struct // tvShFileOpStruct

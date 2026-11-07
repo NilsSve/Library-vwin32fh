@@ -274,10 +274,12 @@ Struct tvShFileOpStruct
   Pointer  pFrom
   Pointer  pTo
   Short    fFlags
-  Integer  fAnyOperationsAborted
+  // A 64-bit program has its two-byte gap here, so fAnyOperationsAborted starts 36 bytes in, as Windows reads it
+  // (it was after it - Windows' answer landed two bytes into the member). A 32-bit program has no gaps: 30 bytes.
 #IFDEF IS$WIN64
     Short  ShFileOpStructMissingAlignment2
 #ENDIF
+  Integer  fAnyOperationsAborted
   Pointer  hNameMappings
   Pointer  lpszProgressTitle      // only used if FOF_SIMPLEPROGRESS
 End_Struct // tvShFileOpStruct
